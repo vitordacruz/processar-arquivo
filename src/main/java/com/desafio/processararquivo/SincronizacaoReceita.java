@@ -32,6 +32,7 @@ package com.desafio.processararquivo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.desafio.processararquivo.dto.DadosArquivoDTO;
 import com.desafio.processararquivo.exceptions.QuantidadeColunasInvalidaException;
 
 @SpringBootApplication
@@ -53,6 +54,17 @@ public class SincronizacaoReceita {
 		if (colunas.length != quantidadeColunas) {
 			throw new QuantidadeColunasInvalidaException();
 		}
+		
+	}
+	
+	public static DadosArquivoDTO criaDTO(String linha) {
+		
+		String[] colunas = linha.trim().split(";");
+		
+		String valor = colunas[2].replace(".", "").replace(",", ".");
+		Double saldo = Double.parseDouble(valor);
+		
+		return new DadosArquivoDTO(colunas[0], colunas[1], saldo, colunas[3]);
 		
 	}
 

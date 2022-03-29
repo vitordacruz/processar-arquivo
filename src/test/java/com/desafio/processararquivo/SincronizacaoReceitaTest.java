@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import com.desafio.processararquivo.dto.DadosArquivoDTO;
 import com.desafio.processararquivo.exceptions.QuantidadeColunasInvalidaException;
+
 
 
 
@@ -64,6 +66,37 @@ public class SincronizacaoReceitaTest {
 		
 		assertEquals(thrown3.getMessage(), QUANTIDADE_DE_COLUNAS_INVÁLIDA);
 
+		
+	}
+	
+	@Test
+	public void verificaSeCriaDTOCorretamente() {
+		
+		// Give
+		
+		String agencia = "0101";
+		
+		String conta = "12225-6";
+		
+		String contaDTO = "122256";
+		
+		String saldo = "100,00";
+		
+		Double saldoDouble = 100D;
+		
+		String status = "A";
+		
+		String linha1 = agencia +";" + conta + ";" + saldo + ";" + status+ "\n";
+		
+		DadosArquivoDTO dto = SincronizacaoReceita.criaDTO(linha1);
+		
+		// Then
+		
+		assertEquals(dto.getAgencia(), agencia);
+		assertEquals(dto.getConta(), contaDTO);
+		assertEquals(dto.getSaldo(), saldoDouble);
+		assertEquals(dto.getStatus(), status);
+		
 		
 	}
 
