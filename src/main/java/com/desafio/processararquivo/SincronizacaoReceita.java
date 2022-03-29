@@ -32,13 +32,27 @@ package com.desafio.processararquivo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.desafio.processararquivo.exceptions.QuantidadeColunasInvalidaException;
+
 @SpringBootApplication
 public class SincronizacaoReceita {
+	
+	private static int quantidadeColunas = 4;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SincronizacaoReceita.class, args);
 		
 		
+		
+	}
+	
+	public static void validaQuantidadeColunas(String linha) {
+		
+		String[] colunas = linha.split(";");
+		
+		if (colunas.length != quantidadeColunas) {
+			throw new QuantidadeColunasInvalidaException();
+		}
 		
 	}
 
