@@ -29,6 +29,11 @@ agencia;conta;saldo;status
 */
 package com.desafio.processararquivo;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -65,6 +70,16 @@ public class SincronizacaoReceita {
 		Double saldo = Double.parseDouble(valor);
 		
 		return new DadosArquivoDTO(colunas[0], colunas[1], saldo, colunas[3]);
+		
+	}
+	
+	public static synchronized void escreveLinhaNoArquivo(String linha, Path path) throws IOException {
+		
+		Files.writeString(
+				path,
+				linha + System.lineSeparator(),
+				StandardOpenOption.CREATE, StandardOpenOption.APPEND
+		    );
 		
 	}
 
