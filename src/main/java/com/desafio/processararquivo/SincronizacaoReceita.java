@@ -32,7 +32,9 @@ package com.desafio.processararquivo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.stream.Stream;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -48,8 +50,104 @@ public class SincronizacaoReceita {
 	public static void main(String[] args) {
 		SpringApplication.run(SincronizacaoReceita.class, args);
 		
+		if (args == null || args.length != 1 
+				|| args[0] == null || args[0].isBlank()) {
+			System.out.println("Você deve especificar o arquivo");
+			return;
+		}
 		
+		String enderecoArquivo = args[0];
+			
+		processaArquivo(enderecoArquivo);
 		
+	}
+	
+	private static void processaArquivo(String enderecoArquivo) {
+		
+		System.out.println("Processando arquivo");
+		
+		Path path = Paths.get(enderecoArquivo);
+		final Path pathArquivoNovo= Paths.get(enderecoArquivo + ".processado.csv");
+		
+		if (!path.toFile().exists()) {
+			System.out.println("Arquivo não existe");
+			System.out.println("Terminou");
+			return;
+		}
+		
+		if (pathArquivoNovo.toFile().exists()) {
+			pathArquivoNovo.toFile().delete();
+		}
+		
+		try (Stream<String> stream = Files.lines(path)) {
+				
+			ReceitaService receitaService = new ReceitaService();
+			
+			Integer[] numeroLinha = { 0 };
+
+	        stream.forEach((String linha) -> {
+	        	
+	        	numeroLinha[0] = numeroLinha[0] + 1;
+	        		        	
+	        	System.out.println("Processando a linha " + numeroLinha[0]);
+	        	
+	        	// primeira linha deve ser os nomes das colunas
+	        	if (numeroLinha[0] > 1) {
+	        	
+	        		DadosArquivoDTO dto = null;
+	        		
+	        		try {
+			        	//processa a linha do arquivo
+			        	processaLinha(pathArquivoNovo, receitaService, linha);
+			        	
+	        		} catch (Exception e) {
+	        			
+	        			System.out.println(e.getMessage());
+	        			
+	        			try {
+							escreveLinhaNoArquivo(linha + ";E", pathArquivoNovo);
+						} catch (IOException e1) {
+							System.out.println("Ocorreu um erro");
+							System.out.println(e1.getMessage());
+						}
+					}
+	        		
+	        		
+	        	} else {
+	        		try {
+			        	//processa a linha do arquivo
+			        	validaQuantidadeColunas(linha);
+			        	escreveLinhaNoArquivo(linha + ";result", pathArquivoNovo);
+			        	
+	        		} catch (Exception e) {
+	        			
+	        			System.out.println(e.getMessage());
+	        			
+					}
+	        		
+	        	}
+	        	
+	        });
+	        System.out.println("Terminou");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void processaLinha(Path path, ReceitaService receitaService, String linha)
+			throws InterruptedException, IOException {
+		boolean foiAtualizado;
+		DadosArquivoDTO dto;
+		validaQuantidadeColunas(linha);
+		dto = criaDTO(linha);
+		
+		foiAtualizado = receitaService.atualizarConta(dto.getAgencia(), dto.getConta(), dto.getSaldo(), dto.getStatus());
+		
+		if (foiAtualizado) {
+			escreveLinhaNoArquivo(linha + ";A", path);
+		} else {
+			escreveLinhaNoArquivo(linha + ";N", path);
+		}
 	}
 	
 	public static void validaQuantidadeColunas(String linha) {
