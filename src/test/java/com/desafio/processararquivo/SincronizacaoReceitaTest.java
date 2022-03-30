@@ -6,14 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import com.desafio.processararquivo.dto.DadosArquivoDTO;
+import com.desafio.processararquivo.exceptions.NomeArquivoInvalidoNoArgumentoException;
 import com.desafio.processararquivo.exceptions.QuantidadeColunasInvalidaException;
-
-
-
 
 public class SincronizacaoReceitaTest {
 	
-	private static final String QUANTIDADE_DE_COLUNAS_INVÁLIDA = "Quantidade de colunas inválida";
+	private static final String QUANTIDADE_DE_COLUNAS_INVALIDA = "Quantidade de colunas inválida";
+	private static final String NOME_ARQUIVO_INVALIDO = "Nome Arquivo Inválido";
 
 	@Test
 	public void verificaSeValidaQuantidadeColunasSucesso() {
@@ -60,11 +59,11 @@ public class SincronizacaoReceitaTest {
 		           () -> SincronizacaoReceita.validaQuantidadeColunas(linha3)
 		    );
 		
-		assertEquals(thrown1.getMessage(), QUANTIDADE_DE_COLUNAS_INVÁLIDA);
+		assertEquals(thrown1.getMessage(), QUANTIDADE_DE_COLUNAS_INVALIDA);
 		
-		assertEquals(thrown2.getMessage(), QUANTIDADE_DE_COLUNAS_INVÁLIDA);
+		assertEquals(thrown2.getMessage(), QUANTIDADE_DE_COLUNAS_INVALIDA);
 		
-		assertEquals(thrown3.getMessage(), QUANTIDADE_DE_COLUNAS_INVÁLIDA);
+		assertEquals(thrown3.getMessage(), QUANTIDADE_DE_COLUNAS_INVALIDA);
 
 		
 	}
@@ -97,6 +96,52 @@ public class SincronizacaoReceitaTest {
 		assertEquals(dto.getSaldo(), saldoDouble);
 		assertEquals(dto.getStatus(), status);
 		
+		
+	}
+	
+	@Test
+	public void verificaSeExtraioEnderecoArquivoDoArgumetoCorretamente() {
+		
+		// Give
+		
+		String nomeArquivo = "texto.csv";
+		
+		String nomeArquivo1 = "nome texto.csv";
+		
+		String parametro = "arquivo=";
+		
+		String argumentoTeste1 = parametro + nomeArquivo;
+		String argumentoTeste2 = parametro + nomeArquivo1;
+		String argumentoTeste3 = parametro = parametro +  "C:/pasta/" + nomeArquivo;
+		
+		// Then
+		
+		assertEquals(nomeArquivo, SincronizacaoReceita.extraiEnderecoArquivoDoArgumeto(argumentoTeste1));
+		assertEquals(nomeArquivo1, SincronizacaoReceita.extraiEnderecoArquivoDoArgumeto(argumentoTeste2));
+		assertEquals("C:/pasta/" + nomeArquivo, SincronizacaoReceita.extraiEnderecoArquivoDoArgumeto(argumentoTeste3));
+		
+	}
+	
+	@Test
+	public void verificaSeExtraioEnderecoArquivoDoArgumetoErrado() {
+		
+		// Give
+		
+		String nomeArquivo = "texto.csv";
+		
+		String argumentoTeste1 = nomeArquivo;
+
+		
+		// Then
+		
+		NomeArquivoInvalidoNoArgumentoException thrown1 = assertThrows(
+				NomeArquivoInvalidoNoArgumentoException.class,
+		           () -> SincronizacaoReceita.extraiEnderecoArquivoDoArgumeto(argumentoTeste1)
+		    );
+
+		
+		assertEquals(thrown1.getMessage(), NOME_ARQUIVO_INVALIDO);
+
 		
 	}
 

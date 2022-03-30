@@ -40,24 +40,51 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.desafio.processararquivo.dto.DadosArquivoDTO;
+import com.desafio.processararquivo.exceptions.NomeArquivoInvalidoNoArgumentoException;
 import com.desafio.processararquivo.exceptions.QuantidadeColunasInvalidaException;
 
 @SpringBootApplication
 public class SincronizacaoReceita {
 	
 	private static int quantidadeColunas = 4;
+	private static final String NOME_PARAMETRO_ARQUIVO = "arquivo=";
+	private static final String MENSAGEM_NOME_ARQUIVO_INVALIDO = "Você deve informar o endereço do arquivo" + System.lineSeparator()
+	+ "\tO argumento com o endereço do arquivo deve ser assim arquivo=<ENDERECO_ARQUIVO>";
 
 	public static void main(String[] args) {
 		SpringApplication.run(SincronizacaoReceita.class, args);
+
 		
-		if (args == null || args.length != 1 
-				|| args[0] == null || args[0].isBlank()) {
-			System.out.println("Você deve especificar o arquivo");
+		if (args == null || args.length == 0) {
+			System.out.println(MENSAGEM_NOME_ARQUIVO_INVALIDO);
+			return;
+		}		
+		
+		String enderecoArquivo = null;
+		
+		for (int i = 0; i < args.length; i++) {
+			String argumento = args[i];
+			
+			if (argumento.startsWith(NOME_PARAMETRO_ARQUIVO)) {
+				try {
+					enderecoArquivo = extraiEnderecoArquivoDoArgumeto(argumento);
+				} catch (NomeArquivoInvalidoNoArgumentoException e) {
+					System.out.println(MENSAGEM_NOME_ARQUIVO_INVALIDO);
+					return;
+				}
+			}
+			
+		}
+		
+		
+		if (enderecoArquivo == null || enderecoArquivo.isBlank()) {
+			System.out.println(MENSAGEM_NOME_ARQUIVO_INVALIDO);
+			return;
+		} else if (!enderecoArquivo.endsWith(".csv")) {
+			System.out.println("Formato de arquivo inválido. O arquivo deve ter a extenção .csv");
 			return;
 		}
 		
-		String enderecoArquivo = args[0];
-			
 		processaArquivo(enderecoArquivo);
 		
 	}
@@ -169,6 +196,20 @@ public class SincronizacaoReceita {
 		
 		return new DadosArquivoDTO(colunas[0], colunas[1], saldo, colunas[3]);
 		
+	}
+	
+	public static String extraiEnderecoArquivoDoArgumeto(String argumento) {
+		if (!argumento.startsWith(NOME_PARAMETRO_ARQUIVO)) {
+			throw new NomeArquivoInvalidoNoArgumentoException();
+		} else {
+			
+			int startIndex = NOME_PARAMETRO_ARQUIVO.length();
+			int endIndex = argumento.length();
+			
+			String texto = argumento.substring(startIndex, endIndex);
+			
+			return texto;
+		}
 	}
 	
 	public static synchronized void escreveLinhaNoArquivo(String linha, Path path) throws IOException {
