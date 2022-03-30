@@ -31,7 +31,7 @@ agencia;conta;saldo;status
   Para executar o código é necessário:  
   - Possuir Java 8 instalado  
   - Possuir o Maven instalado  
-  - Possuir o Arquivo CSV no padrão acima  
+  - Possuir o Arquivo CSV no padrão acima (existe um arquivo CSV de exemplo na raiz do projeto, o nome dele é "arquivo.csv")  
 
 # Passo a passo para execução  
   1. Baixar o código  
