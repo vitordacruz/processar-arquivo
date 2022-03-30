@@ -31,6 +31,23 @@ agencia;conta;saldo;status
   Para executar o código é necessário:  
   - Possuir Java 8 instalado  
   - Possuir o Maven instalado  
-  - Possuir o Arquivo CSV no padrão acima
+  - Possuir o Arquivo CSV no padrão acima  
+
+# Passo a passo para execução  
+  1. Baixar o código  
+  2. Executar na raiz do código o comando "mvn clean package" no prompt de comando do Windows, ou no console se for Linux  
+  3. Acessar a pasta target do código e copiar o arquivo jar gerado (o arquivo "processar-arquivo-0.0.1-SNAPSHOT.jar")  
+  4. Colar o arquivo jar na mesma pasta do arquivo CSV que vai ser processado  
+  5. Abrir o prompt de comando ou console e executar o comando "java -jar processar-arquivo-0.0.1-SNAPSHOT.jar arquivo=<endereco_do_arquivo>" onde <endereco_do_arquivo> deve ser o endereço do arquivo CSV que vai ser processado  
+
+# Observações
+  - Se o nome do arquivo CSV que vai ser processado for "arquivo.csv" o nome do arquivo processado será "arquivo.csv.processado.csv" 
+  - Se o processamento for executado uma segunda vez o arquivo antigo que foi procesado será deletado e um novo será gerado  
+  - No arquivo processado será criado uma nova coluna chamada de "result" e será preenchida com o resultado do envio da atualização  
+  - Na coluna "result" os possíveis valores são:  
+    - "A" = Atualização
+    - "N" = Não Atualizado
+    - "E" = Erro
+  
   
   
