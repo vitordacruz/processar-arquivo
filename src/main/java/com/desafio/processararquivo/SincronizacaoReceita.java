@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 import com.desafio.processararquivo.dto.DadosArquivoDTO;
 import com.desafio.processararquivo.exceptions.NomeArquivoInvalidoNoArgumentoException;
@@ -52,7 +53,7 @@ public class SincronizacaoReceita {
 	+ "\tO argumento com o endereço do arquivo deve ser assim arquivo=<ENDERECO_ARQUIVO>";
 
 	public static void main(String[] args) {
-		SpringApplication.run(SincronizacaoReceita.class, args);
+		ApplicationContext appContext = SpringApplication.run(SincronizacaoReceita.class, args);
 
 		
 		if (args == null || args.length == 0) {
@@ -85,11 +86,13 @@ public class SincronizacaoReceita {
 			return;
 		}
 		
-		processaArquivo(enderecoArquivo);
+		ReceitaService receitaService = (ReceitaService) appContext.getBean("receitaService");
+		
+		processaArquivo(enderecoArquivo, receitaService);
 		
 	}
 	
-	private static void processaArquivo(String enderecoArquivo) {
+	private static void processaArquivo(String enderecoArquivo, ReceitaService receitaService) {
 		
 		System.out.println("Processando arquivo");
 		
@@ -107,8 +110,7 @@ public class SincronizacaoReceita {
 		}
 		
 		try (Stream<String> stream = Files.lines(path)) {
-				
-			ReceitaService receitaService = new ReceitaService();
+
 			
 			Integer[] numeroLinha = { 0 };
 
